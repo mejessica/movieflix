@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Ator {
+  id              Int            @id @default(autoincrement())
+  nome            String         @db.VarChar(255)
+  data_nascimento DateTime?      @db.Date
+  nacionalidade   String?        @db.VarChar(100)
+  elenco_filme    Elenco_filme[]
+
+  @@map("atores")
+}
+
+model Diretor {
+  id              Int       @id @default(autoincrement())
+  nome            String    @db.VarChar(255)
+  data_nascimento DateTime? @db.Date
+  nacionalidade   String?   @db.VarChar(100)
+  filmes          Filme[]
+
+  @@map("diretores")
+}
+
+model Elenco_filme {
+  filme_id Int
+  ator_id  Int
+  papel    String? @db.VarChar(255)
+  atores   Ator  @relation(fields: [ator_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  filmes   Filme  @relation(fields: [filme_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([filme_id, ator_id])
+
+  @@map("elenco_filme")
+
+}
+
+model Filme {
+  id                   Int            @id @default(autoincrement())
+  titulo               String         @db.VarChar(255)
+  ano_lancamento       Int
+  duracao_minutos      Int?
+  classificacao_etaria String?        @db.VarChar(10)
+  diretor_id           Int?
+  genero_id            Int?
+  sinopse              String?
+  elenco_filme         Elenco_filme[]
+  diretores            Diretor?     @relation(fields: [diretor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  generos              generos?       @relation(fields: [genero_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("filmes")
+}
+
+model generos {
+  id     Int      @id @default(autoincrement())
+  nome   String   @db.VarChar(100)
+  filmes Filme[]
+
+  @@map("generos")
+}
