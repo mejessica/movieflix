@@ -63,43 +63,66 @@ app.post('/movies', async (req, res) => {
 
 app.put('/movies/:id', async (req, res) => {
     const id = Number(req.params.id) //converte para numero
-    try{
-    const movie = await prisma.filme.findUnique({
-        where: {
-            id
+    try {
+        const movie = await prisma.filme.findUnique({
+            where: {
+                id
+            }
+        })
+        if (!movie) {
+            return res.status(404).send({ message: 'Filme não encontrado' })
         }
-    })
-    if(!movie){
-        return res.status(404).send({message: 'Filme não encontrado'})
-    }
-   
-    const data = { ...req.body };
 
-    await prisma.filme.update({
-        where: {
-            id
-        },
-        data: data
-    })
-    }catch(error){
+        const data = { ...req.body };
+
+        await prisma.filme.update({
+            where: {
+                id
+            },
+            data: data
+        })
+    } catch (error) {
         console.log(error)
-        return res.status(500).send({message: 'Erro ao atualizar registro'})
+        return res.status(500).send({ message: 'Erro ao atualizar registro' })
     }
     res.status(200).send({ message: 'Filme atualizado' })
 
 })
 
-app.delete("/movies/:id", async (req, res)=>{
+app.delete("/movies/:id", async (req, res) => {
     const id = Number(req.params.id)
-    const movie =  await prisma.filme.findUnique({where: {id}})
-    
-    if(!movie){
-        return res.status(404).send({message: 'filme nao encontrado'})
+    const movie = await prisma.filme.findUnique({ where: { id } })
+
+    if (!movie) {
+        return res.status(404).send({ message: 'filme nao encontrado' })
     }
 
-    await prisma.filme.delete({where:{ id }})
+    await prisma.filme.delete({ where: { id } })
 
-    res.status(200).send({message: 'filme deletado'})
+    res.status(200).send({ message: 'filme deletado' })
+})
+
+app.get('/movies/:genero', async (req, res) => {
+    try {
+        const moviesFilteredByGenre = await prisma.filme.findMany({
+            include: {
+                generos: true,
+            },
+            where: {
+                generos: {
+                    nome: {
+                        equals: req.params.genero,
+                        mode: "insensitive"
+                    }
+                }
+            }
+        })
+
+        res.status(200).send(moviesFilteredByGenre)
+    }catch{
+        res.status(500).send({message: 'erro no servidor'})
+    }
+
 })
 
 app.listen(port, () => {
