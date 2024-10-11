@@ -31,13 +31,14 @@ app.post('/movies', async (req, res) => {
     try {
         const movieWithSameTitle = await prisma.filme.findFirst({
             where: {
-                titulo: {equals: titulo, mode: 'insensitive'} //retorna independete de esar maiusculo ou minusculo
+                titulo: { equals: titulo, mode: 'insensitive' } //retorna independete de esar maiusculo ou minusculo
             }
         })
 
-        if(movieWithSameTitle){
-            return res.status(409).send({message: 
-                'ja existe um filme com esse título'
+        if (movieWithSameTitle) {
+            return res.status(409).send({
+                message:
+                    'ja existe um filme com esse título'
             }) //dado duplicado
         }
 
@@ -52,12 +53,40 @@ app.post('/movies', async (req, res) => {
                 sinopse
             }
         });
-    }catch(error){
-        console.error('Erro ao cadastrar filme:', error); 
-        return res.status(500).send({message: 'falha ao cadastrar um filme'})
+    } catch (error) {
+        console.error('Erro ao cadastrar filme:', error);
+        return res.status(500).send({ message: 'falha ao cadastrar um filme' })
     }
 
     res.status(201).send()
+})
+
+app.put('/movies/:id', async (req, res) => {
+    const id = Number(req.params.id) //converte para numero
+    try{
+    const movie = await prisma.filme.findUnique({
+        where: {
+            id
+        }
+    })
+    if(!movie){
+        return res.status(404).send({message: 'Filme não encontrado'})
+    }
+   
+    const data = { ...req.body };
+
+    await prisma.filme.update({
+        where: {
+            id
+        },
+        data: data
+    })
+    }catch(error){
+        console.log(error)
+        return res.status(500).send({message: 'Erro ao atualizar registro'})
+    }
+    res.status(200).send({ message: 'Filme atualizado' })
+
 })
 
 app.listen(port, () => {
