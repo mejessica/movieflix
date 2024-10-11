@@ -8,7 +8,9 @@
     "paths": {
         "/movies": {
             "get": {
-                "tags":["Movie"],
+                "tags": [
+                    "Movie"
+                ],
                 "summary": "Obter todos os filmes",
                 "responses": {
                     "200": {
@@ -23,6 +25,70 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/movies/{id}": {
+            "put": {
+                "tags":["Movie"],
+                "summary": "Atualizar um filme existente",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID do filme a ser atualizado",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MovieInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Filme atualizado com sucesso"
+                    },
+                    "404": {
+                        "description": "Filme não encontrado"
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Movie"],
+                "summary": "Remover um filme",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "ID do filme a ser removido",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Filme removido com sucesso"
+                    },
+                    "404": {
+                        "description": "O filme não foi encontrado"
+                    },
+                    "500": {
+                        "description": "Não foi possível remover o filme"
                     }
                 }
             }
@@ -65,20 +131,61 @@
                         "type": "integer",
                         "description": "ID do genero"
                     },
-                    "generos":{
+                    "generos": {
                         "type": "object",
-                        "properties":{
-                            "id":{
-                                "type":"integer",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
                                 "description": "Id do genero"
                             },
-                            "name":{
-                                "type":"string",
+                            "name": {
+                                "type": "string",
                                 "description": "nome do genero"
                             }
                         }
                     },
-                    "sinopse":{
+                    "sinopse": {
+                        "type": "string",
+                        "description": "Sinopse do filme"
+                    }
+                }
+            },
+            "MovieInput": {
+                "type": "object",
+                "required": [
+                    "titulo",
+                    "ano_lancamento",
+                    "duracao_minutos",
+                    "sinopse",
+                    "diretor_id",
+                    "genero_id"
+                ],
+                "properties": {
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título do filme"
+                    },
+                    "genero": {
+                        "type": "string",
+                        "description": "Gênero do filme"
+                    },
+                    "ano_lancamento": {
+                        "type": "integer",
+                        "description": "Lançamento do filme"
+                    },
+                    "duracao_minutos": {
+                        "type": "integer",
+                        "description": "Duração do filme"
+                    },
+                    "diretor_id": {
+                        "type": "integer",
+                        "description": "ID do diretor"
+                    },
+                    "genero_id": {
+                        "type": "integer",
+                        "description": "ID do genero"
+                    },
+                    "sinopse": {
                         "type": "string",
                         "description": "Sinopse do filme"
                     }
