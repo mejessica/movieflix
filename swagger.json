@@ -1,0 +1,89 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de Filmes",
+        "description": "API para gerenciamento de filmes",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/movies": {
+            "get": {
+                "tags":["Movie"],
+                "summary": "Obter todos os filmes",
+                "responses": {
+                    "200": {
+                        "description": "Retorna uma lista de filmes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Movie"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Movie": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "ID do filme"
+                    },
+                    "titulo": {
+                        "type": "string",
+                        "description": "Título do filme"
+                    },
+                    "genero": {
+                        "type": "string",
+                        "description": "Gênero do filme"
+                    },
+                    "ano_lancamento": {
+                        "type": "integer",
+                        "description": "Lançamento do filme"
+                    },
+                    "duracao_minutos": {
+                        "type": "integer",
+                        "description": "Duração do filme"
+                    },
+                    "classificacao_etaria": {
+                        "type": "string",
+                        "description": "Faixa etária do filme"
+                    },
+                    "diretor_id": {
+                        "type": "integer",
+                        "description": "ID do diretor"
+                    },
+                    "genero_id": {
+                        "type": "integer",
+                        "description": "ID do genero"
+                    },
+                    "generos":{
+                        "type": "object",
+                        "properties":{
+                            "id":{
+                                "type":"integer",
+                                "description": "Id do genero"
+                            },
+                            "name":{
+                                "type":"string",
+                                "description": "nome do genero"
+                            }
+                        }
+                    },
+                    "sinopse":{
+                        "type": "string",
+                        "description": "Sinopse do filme"
+                    }
+                }
+            }
+        }
+    }
+}
