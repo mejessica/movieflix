@@ -89,6 +89,19 @@ app.put('/movies/:id', async (req, res) => {
 
 })
 
+app.delete("/movies/:id", async (req, res)=>{
+    const id = Number(req.params.id)
+    const movie =  await prisma.filme.findUnique({where: {id}})
+    
+    if(!movie){
+        return res.status(404).send({message: 'filme nao encontrado'})
+    }
+
+    await prisma.filme.delete({where:{ id }})
+
+    res.status(200).send({message: 'filme deletado'})
+})
+
 app.listen(port, () => {
     console.log('servidor ligado');
 })
