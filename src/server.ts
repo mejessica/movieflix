@@ -1,5 +1,5 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import swaggerUi from 'swagger-ui-express'
 import swaggerDocument from '../swagger.json'
 
@@ -14,17 +14,63 @@ app.get('/', (req, res) => {
     res.send('home pagr');
 })
 
-app.get('/movies', async (_, res) => {
-    const movies = await prisma.filme.findMany({
-        orderBy: {
+app.get('/movies', async (req, res) => {
+    const sort = req.query.sort
+    const sinopse = req.query.sinopse as string
+    let orderBy: Prisma.FilmeOrderByWithRelationInput | Prisma.FilmeOrderByWithRelationInput[] | undefined;
+
+    if (sort === 'titulo') {
+        orderBy = {
             titulo: 'asc'
-        },
-        include: {
-            generos: true,
-            elenco_filme: true
         }
-    })
-    res.json(movies);
+    }
+    if (sort === 'ano_lancamento') {
+        orderBy = {
+            ano_lancamento: 'desc'
+        }
+    }
+
+    try {
+        const movies = await prisma.filme.findMany({
+            where: {
+                sinopse: {
+                    contains: sinopse,
+                    mode: 'insensitive'
+                }
+            },
+            orderBy,
+            include: {
+                generos: true,
+                elenco_filme: true
+            }
+        })
+
+        if(movies.length === 0){
+            return res.status(404).send({ message: 'Filme não encontrado' })
+        }
+
+        const totalFilmes = movies.length
+        const duracao = []
+        let soma = 0
+
+        movies.forEach((item) => {
+            duracao.push(item.duracao_minutos)
+            soma += Number(item.duracao_minutos);
+        })
+
+        const mediaDuracao = soma / duracao.length
+
+        res.json(
+            {
+                totalMovies: totalFilmes,
+                mediaDuracao: mediaDuracao,
+                movies: movies
+            }
+        );
+      
+    } catch {
+        return res.status(500).send({ message: 'erro no servidor' })
+    }
 })
 
 app.post('/movies', async (req, res) => {
@@ -122,10 +168,104 @@ app.get('/movies/:genero', async (req, res) => {
         })
 
         res.status(200).send(moviesFilteredByGenre)
-    }catch{
-        res.status(500).send({message: 'erro no servidor'})
+    } catch {
+        res.status(500).send({ message: 'erro no servidor' })
+    }
+})
+
+//generos
+
+app.put('/genero/:id', async (req, res) => {
+    const id = Number(req.params.id)
+    const data = { ...req.body };
+
+    const genero = await prisma.generos.findUnique({
+        where: {
+            id
+        }
+    })
+    if (!genero) {
+        return res.status(404).send({ message: 'Genero não encontrado' })
     }
 
+    const findGenero = await prisma.generos.findFirst({
+        where: {
+            nome: {
+                equals: data.nome,
+                mode: 'insensitive'
+            }
+        }
+    })
+
+    if (findGenero) {
+        return res.status(409).send({ message: "Este nome de gênero já existe." });
+    }
+
+
+    await prisma.generos.update({
+        where: {
+            id
+        },
+        data: data
+    })
+
+    res.status(200).send({ message: 'Genero atualizado' })
+
+})
+
+app.post('/genero', async (req, res) => {
+    const { nome } = req.body;
+
+    try {
+        const genreWithSameTitle = await prisma.generos.findFirst({
+            where: {
+                nome: { equals: nome, mode: 'insensitive' }
+            }
+        })
+
+        if (genreWithSameTitle) {
+            return res.status(409).send({
+                message:
+                    'ja existe um genero com esse título'
+            }) //dado duplicado
+        }
+
+        await prisma.generos.create({
+            data: {
+                nome
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao cadastrar genero:', error);
+        return res.status(500).send({ message: 'falha ao cadastrar um genero' })
+    }
+
+    res.status(201).send({ message: 'genero salvo' })
+})
+
+app.get('/genero', async (_, res) => {
+    const genero = await prisma.generos.findMany({
+        orderBy: {
+            nome: 'asc'
+        },
+        include: {
+            filmes: true,
+        }
+    })
+    res.json(genero);
+})
+
+app.delete('/genero/:id', async (req, res) => {
+    const id = Number(req.params.id)
+    const genero = await prisma.generos.findUnique({ where: { id } })
+
+    if (!genero) {
+        return res.status(404).send({ message: 'genero nao encontrado' })
+    }
+
+    await prisma.generos.delete({ where: { id } })
+
+    res.status(200).send({ message: 'genero deletado' })
 })
 
 app.listen(port, () => {

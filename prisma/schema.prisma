@@ -51,12 +51,12 @@ model Filme {
   sinopse              String?
   elenco_filme         Elenco_filme[]
   diretores            Diretor?     @relation(fields: [diretor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  generos              generos?       @relation(fields: [genero_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  generos              Genero?       @relation(fields: [genero_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("filmes")
 }
 
-model generos {
+model Genero {
   id     Int      @id @default(autoincrement())
   nome   String   @db.VarChar(100)
   filmes Filme[]
