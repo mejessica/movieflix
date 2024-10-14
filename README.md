@@ -30,7 +30,7 @@ Não conhecia ainda e facilitou muito minha conexão com a api e com o prisma, a
 
 ## O que aprendi com o projeto 
 
-Nesse projeto eu fui guiada pelos mentores do meu curso, e pude colocar em prática toa a parte de backend aprendida durante o curso. Entendi o funcionamento do prisma, a conexão com o banco e como manipular através das rotas. Para facilitar meu desempenho, utilizei o Thunder Client, uma extensão do VScode que me auxiliou na simulação da interação do cliente com o sistema. 
+Nesse projeto eu fui guiada pelos mentores do meu curso, e pude colocar em prática toda a parte de backend aprendida durante o curso. Entendi o funcionamento do prisma, a conexão com o banco e como manipular através das rotas. Para facilitar meu desempenho, utilizei o Thunder Client, uma extensão do VScode que me auxiliou na simulação da interação do cliente com o sistema. 
 
 Conheci o Swagger e a forma certa de documentar minha api, bem como tive contato com a base do TS em uma aplicação. 
 
